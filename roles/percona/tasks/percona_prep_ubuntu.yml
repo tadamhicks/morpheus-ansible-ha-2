@@ -1,0 +1,20 @@
+---
+
+- name: Install MySQL Python Lib
+  apt:
+    name: python-mysqldb
+    state: present
+
+- name: Percona ensure pip is present
+  apt:
+    name: python-pip
+    state: present
+
+- name: pip install python libs for MySQL
+  pip:
+    name: pymysql
+    
+- name: Remove Apparmor It can cause errors with percona. 
+  apt:
+    name: apparmor
+    state: absent

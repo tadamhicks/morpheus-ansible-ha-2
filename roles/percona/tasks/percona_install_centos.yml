@@ -1,0 +1,16 @@
+---
+- name: Import Percona Repo
+  yum:
+      name: "{{ percona_repo_url }}"
+      state: present
+
+- name: Install Percona
+  yum: 
+      name: "{{ percona_db_version }}"
+      state: present
+
+- name: Ensuring the Percona Service is running
+  systemd: 
+      name: mysql
+      state: started
+      enabled: true

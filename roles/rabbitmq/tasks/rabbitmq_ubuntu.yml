@@ -1,0 +1,123 @@
+---
+
+# Rabbitmq Pre-Req erlang needs to be instaled.  
+- name: Add Erlang Solutions repository
+  apt_repository:
+    repo: '{{ erlang_repo_ubun_16_04 }}'
+    state: present
+
+- name: Update cache
+  apt:
+    update_cache: yes
+
+- name: Install erlang
+  apt:
+    name: erlang
+
+
+# Install RabbitMQ Server and enable on boot
+- name: Install RabbitMQ-Server
+  apt:
+    name: rabbitmq-server
+
+- name: Enable RabbitMQ on boot
+  systemd:
+     name: rabbitmq-server
+     enabled: yes
+
+
+# Start RabbitMQ on master node. 
+- name: Start RabbitMQ on Node 1
+  systemd: 
+     name: rabbitmq-server
+     state: started
+     enabled: yes
+  when: ansible_default_ipv4.address != initial_rabbit_host
+
+
+# Gather the erlang cookie from the master node
+- name: Get erlang cookie
+  shell: cat /var/lib/rabbitmq/.erlang.cookie
+  delegate_to: "{{ initial_rabbit_host }}"
+  register: erlang_Cookie
+
+
+# Copy the erlang cookie to the remaining hosts  
+- name: Add erlang cookie to other hosts.
+  shell: echo "{{ erlang_Cookie.stdout }}" > '/var/lib/rabbitmq/.erlang.cookie'
+  when: ansible_default_ipv4.address != initial_rabbit_host
+
+
+# RabbitMQ Clustering Configuration
+
+# Master bring up
+- name: Restarting rabbitmq-server on master
+  service:
+    name: rabbitmq-server
+    state: restarted
+  when: ansible_default_ipv4.address == initial_rabbit_host
+  
+- name: Starting rabbitmq app on master
+  command: rabbitmqctl start_app
+  register: cluster_master
+  when: ansible_default_ipv4.address == initial_rabbit_host
+
+
+# Kill rabbitmq on all other nodes
+- name: Sending sigterm to any running rabbitmq processes
+  shell: pkill -u rabbitmq || true
+  when: ansible_default_ipv4.address != initial_rabbit_host
+
+# Restarting RabbitMQ Server on all remaining nodes
+- name: Restarting rabbitmq-server
+  service:
+    name: rabbitmq-server
+    state: restarted
+  when: ansible_default_ipv4.address != initial_rabbit_host
+
+#Stop rabbitmq app on all remaining nodes.
+- name: Stopping rabbitmq app
+  command: rabbitmqctl stop_app
+  when: ansible_default_ipv4.address != initial_rabbit_host
+
+# Resetting rabbitmq app
+- name: Resetting rabbitmq app
+  command: rabbitmqctl reset
+  when: ansible_default_ipv4.address != initial_rabbit_host
+
+# Updating hosts file for rabbitmq nodes.
+- name: Add Hosts into host file.
+  lineinfile:
+     path: /etc/hosts
+     line: '{{ item }}'
+  with_items: '{{ short_name_hosts }}' 
+
+# Add all nodes to the master node.  
+- name: Joining nodes to rabbitmq cluster
+  command: rabbitmqctl join_cluster rabbit@{{ initial_rabbit_host_shortname }}
+  register: cluster_joined
+  when: ansible_default_ipv4.address != initial_rabbit_host
+
+# Start Rabbitmq App on each host after added to cluster.   
+- name: Starting rabbitmq app
+  command: rabbitmqctl start_app
+  when: ansible_default_ipv4.address != initial_rabbit_host
+
+# Add admin user that was defined within the workbook. 
+- name: Add admin user to master node
+  command: rabbitmqctl add_user {{ rabbit_admin_un }} {{ rabbit_admin_pw }}
+  when: ansible_default_ipv4.address == initial_rabbit_host
+
+# Grant admin proper privs. 
+- name: Grant admin user permissions on master node.
+  command: rabbitmqctl set_permissions -p / {{ rabbit_admin_un }} ".*" ".*" ".*"
+  when: ansible_default_ipv4.address == initial_rabbit_host
+
+# Set admin user tags
+- name: Set admin user user tags
+  command: rabbitmqctl set_user_tags {{ rabbit_admin_un }} administrator
+  when: ansible_default_ipv4.address == initial_rabbit_host
+
+# Enable plugin stomp. 
+- name: Enable rabbitmq_stomp plugin
+  command: rabbitmq-plugins enable rabbitmq_stomp

@@ -1,0 +1,114 @@
+---
+# Universal - need to install python on each host / vm.
+- hosts: all
+  gather_facts: false
+  strategy: free
+  become: true
+  tasks:
+    - name: Prep Hosts with Python 
+      block: 
+        - raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+          changed_when: False
+      rescue:   
+        - raw: test -e /usr/bin/python || (yum install -y python)
+          changed_when: False  
+  tags:
+      - prepare_hosts
+      - distributed
+      - elastic
+      - rabbitmq
+      - percona
+   
+# Distributed Deployment Elastic Search.  
+- hosts: elastic
+  gather_facts: true
+  roles: 
+      - elasticsearch
+  become: true
+  tags:
+      - elastic
+      - distributed
+      
+# Distributed Deployment RabbitMQ
+- hosts: rabbit
+  gather_facts: true
+  roles:
+      - rabbitmq
+  become: true
+  tags:
+      - rabbitmq
+      - distributed
+
+# Distributed Deployment Percona DB
+- hosts: db
+  gather_facts: true
+  pre_tasks:
+     - name: Gather Morpheus facts
+       setup:
+       delegate_to: "{{ item }}"
+       delegate_facts: true
+       with_items: "{{ groups['morpheus'] }}"
+  roles:
+      - percona
+  become: true 
+  tags:
+      - percona
+      - distributed      
+      
+# Distributed Deployment Application Tier
+- hosts: morpheus
+  gather_facts: true
+  pre_tasks:
+      - name: Gather Elastic Facts
+        setup:
+        delegate_to: "{{ item }}"
+        delegate_facts: true
+        with_items: "{{ groups['elastic'] }}"
+      - name: Gather Rabbit Facts
+        setup:
+        delegate_to: "{{ item }}"
+        delegate_facts: true
+        with_items: "{{ groups['rabbit'] }}"
+      - name: Gather DB facts
+        setup:
+        delegate_to: "{{ item }}"
+        delegate_facts: true
+        with_items: "{{ groups['db'] }}"
+  roles:
+      - morpheus
+  become: true 
+  tags: 
+      - morpheus
+      - distributed
+      
+      
+# Elastic Search Verify
+- hosts: elastic
+  gather_facts: true
+  roles:
+      - verify
+  become: true
+  tags: 
+      - verify
+      - verify_elastic
+      
+# Supportability Checks - these are designed to make sure the OS is running supported operating systems and has enough resources as per recommended values. 
+- hosts: all 
+  gather_facts: true
+  roles: 
+      - support
+  become: true
+  tags:
+      - support           
+    
+# Appliance Mode
+# - hosts: appliance
+# gather_facts: true
+# pre_tasks:
+
+
+#roles: 
+# - appliances
+# become: true
+# tags: 
+ # - appliance_setup

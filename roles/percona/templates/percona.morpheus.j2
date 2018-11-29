@@ -1,0 +1,3 @@
+[{% for minion in groups['morpheus'] %}
+"{{ hostvars[minion]['ansible_all_ipv4_addresses'][0] }}"{% if not loop.last %},{% endif %}
+{% endfor %}]

@@ -1,0 +1,7 @@
+cluster.name: {{ es_cluster_name }}
+node.name: {{ ansible_hostname }}
+network.host: 0.0.0.0
+discovery.zen.ping.unicast.hosts: [{% for minion in groups['elastic'] %}
+"{{ hostvars[minion]['ansible_all_ipv4_addresses'][0] }}"{% if not loop.last %},{% endif %}
+{% endfor %}]
+discovery.zen.minimum_master_nodes: 2

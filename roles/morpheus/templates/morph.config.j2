@@ -1,0 +1,21 @@
+appliance_url '{{ appliance_url }}'
+mysql['enable'] = false
+mysql['host'] = { {% for minion in groups['db'] %}
+'{{ hostvars[minion]['ansible_all_ipv4_addresses'][0] }}' => 3306{% if not loop.last %},{% endif %}
+{% endfor %} }
+mysql['morpheus_db'] = '{{ morpheus_db }}'
+mysql['morpheus_db_user'] = '{{ morpheus_db_user }}'
+mysql['morpheus_password'] = '{{ morpheus_db_pass }}'
+rabbitmq['enable'] = false
+rabbitmq['vhost'] = '{{ vhost_name }}'
+rabbitmq['queue_user'] = '{{ rabbitmq_user }}'
+rabbitmq['queue_user_password'] = '{{ rabbitmq_password }}'
+rabbitmq['host'] = '{{ rabbitmq_lb }}'
+rabbitmq['port'] = '5672'
+rabbitmq['stomp_port'] = '61613'
+rabbitmq['heartbeat'] = 50
+elasticsearch['enable'] = false
+elasticsearch['cluster'] = '{{ es_cluster_name }}'
+elasticsearch['es_hosts'] = { {% for minion in groups['elastic'] %}
+'{{ hostvars[minion]['ansible_all_ipv4_addresses'][0] }}' => 9200{% if not loop.last %},{% endif %}
+{% endfor %} }

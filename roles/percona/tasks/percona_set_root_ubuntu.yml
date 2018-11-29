@@ -1,0 +1,5 @@
+---
+
+- name: Change Mysql root password
+  shell: mysqladmin -u root -p{{ mysql_install_pw }} password '{{ mysql_root_pw }}'
+  ignore_errors: True

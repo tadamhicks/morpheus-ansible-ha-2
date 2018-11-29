@@ -1,0 +1,5 @@
+--- 
+- name: Push Morpheus config
+  template:
+      src: morph.config.j2
+      dest: /etc/morpheus/morpheus.rb

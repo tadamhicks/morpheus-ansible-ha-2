@@ -1,0 +1,10 @@
+---
+- name: Install Morpheus
+  apt:
+      deb: "{{ ubuntu_morpheus_feature_package }}"
+      state: present
+
+- name: Install Morpheus Offline
+  apt:
+      deb: "{{ ubuntu_morpheus_feature_offline_package }}"
+      state: present

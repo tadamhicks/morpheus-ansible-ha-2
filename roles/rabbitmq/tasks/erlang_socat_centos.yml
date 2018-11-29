@@ -1,0 +1,7 @@
+---
+- name: install Erlang and Socat
+  yum:
+      name:
+          - erlang
+          - socat 
+      state: present

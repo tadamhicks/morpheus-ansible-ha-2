@@ -1,0 +1,25 @@
+---
+
+# Ubuntu
+- include_tasks: java_ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+- include_tasks: elasticsearch_install_ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+# Centos
+- include_tasks: java_centos.yml
+  when: ansible_distribution == "CentOS"
+  
+- include_tasks: elasticsearch_install_centos.yml
+  when: ansible_distribution == "CentOS"
+
+
+# Universal
+- include_tasks: elasticsearch_config.yml
+
+- name: Restart ElasticSearch on Nodes
+  systemd:
+    name: elasticsearch
+    state: restarted
+    enabled: yes 

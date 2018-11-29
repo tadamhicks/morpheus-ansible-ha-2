@@ -1,0 +1,60 @@
+---
+# Ubuntu: Universal on ANY
+- name: Ubuntu OS Verification
+  block: 
+    - name: Checking OS Distribution
+      assert: 
+        that: 
+          - "'Ubuntu' == ansible_distribution"
+      ignore_errors: yes
+    - name: Checking OS Version 
+      assert:
+        that:      
+          - "ansible_distribution_version == ubuntu_supported_version"
+        fail_msg: "This server does not meet the recommended or supported version requested by Morpheus."
+      ignore_errors: yes
+  when: ansible_distribution == "Ubuntu"     
+
+# CentOS: Universal on ANY
+- name: CentOS OS Verification
+  block: 
+    - name: Checking OS Distribution
+      assert: 
+        that: 
+          - "'CentOS' == ansible_distribution"
+      ignore_errors: yes
+    
+    - name: Checking OS Version
+      assert:
+        that:      
+          - "ansible_distribution_version == centos_supported_version"
+        fail_msg: "This server does not meet the recommended or supported version requested by Morpheus."
+      ignore_errors: yes
+  when: ansible_distribution == "CentOS"     
+
+# Universal Distributed Model
+- name: Verifying physical resources for a distributed model.
+  block:  
+    - assert:
+        that: 
+          - "ansible_memtotal_mb >= '4096'"
+        fail_msg: "This server does not meet the minimum recommended requirements for a distributed deployment model."
+      ignore_errors: yes
+  
+    - assert:
+        that:
+          - "ansible_processor_cores >= '2'"
+        fail_msg: "This server does not meet the minimum recommended requirements for a distributed deployment model."
+      ignore_errors: yes
+
+#- name: Full Report of current environment
+#  vars: 
+#    msg: |
+##        OS Distribution: {{ ansible_distribution }}
+ #       OS Release version: {{ ansible_distribution_version }}
+ #       Total RAM: {{ ansible_memtotal_mb }}
+ #       Toatl Processor Cores: {{ ansible_processor_cores }}
+ #       Total Processor Count: {{ ansible_processor_count }}
+ #       Mount Points: {{ ansible_mounts }}
+ # debug:
+ #   msg: "{{ msg.split('\n') }}"

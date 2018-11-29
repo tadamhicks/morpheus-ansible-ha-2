@@ -1,0 +1,10 @@
+---
+
+- name: Percona create sstuser
+  mysql_user:
+      name: "{{ sstuser }}"
+      password: "{{ sstpassword }}"
+      login_user: root
+      login_password: "{{ mysql_root_pw }}"
+      state: present
+      priv: '*.*:RELOAD,PROCESS,REPLICATION CLIENT,LOCK TABLES'

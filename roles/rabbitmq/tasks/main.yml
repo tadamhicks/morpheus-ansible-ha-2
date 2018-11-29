@@ -1,0 +1,42 @@
+---
+# Universal
+- include_tasks: rabbitmq_etc_hosts.yml
+
+
+# Ubuntu
+
+- include_tasks: erlang_socat_ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+- include_tasks: rabbitmq_install_ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+- include_tasks: rabbitmq_clustering_ubuntu.yml
+  when: 
+    - ansible_distribution == "Ubuntu" 
+    - enable_rabbitmq_clustering and (clustered.stat.exists != True)
+  
+
+
+# CentOS
+  
+- include_tasks: epel_centos.yml
+  when: ansible_distribution == "CentOS"
+
+- include_tasks: erlang_socat_centos.yml
+  when: ansible_distribution == "CentOS"
+
+- include_tasks: rabbitmq_install_centos.yml
+  when: ansible_distribution == "CentOS"
+
+- include_tasks: rabbitmq_clustering_centos.yml
+  when: 
+    - ansible_distribution == "CentOS" 
+    - enable_rabbitmq_clustering and (clustered.stat.exists != True)
+
+# Universal
+
+- include_tasks: rabbitmq_plugins.yml
+
+- include_tasks: rabbitmq_ha_config.yml
+  when: config_rabbitmq_ha and enable_rabbitmq_clustering

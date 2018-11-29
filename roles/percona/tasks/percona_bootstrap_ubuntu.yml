@@ -1,0 +1,32 @@
+---
+- name: Percona Stop Mysql Service
+  systemd:
+      name: mysql
+      state: stopped
+
+- name: Checking to see if percona was bootstrapped or not.
+  stat:
+    path: /opt/percona_install_bootstrap
+  register: bootstrap_result
+
+- name: Percona Bootstrap on master
+  block: 
+    - shell: /etc/init.d/mysql bootstrap-pxc
+    - file: 
+        path: /opt/percona_install_bootstrap 
+        state: touch
+  when: 
+    - inventory_hostname == "{{ groups['db'][0] }}"
+    - bootstrap_result.stat.exists == False
+
+- name: Percona join worker nodes
+  systemd:
+      name: mysql
+      state: started
+  when: inventory_hostname != "{{ groups['db'][0] }}"
+
+- name: Percona master start mysql
+  systemd:
+      name: mysql
+      state: started
+  when: inventory_hostname == "{{ groups['db'][0] }}"

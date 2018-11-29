@@ -1,0 +1,10 @@
+---
+- name: Install Morpheus
+  yum:
+      name: "{{ morpheus_package }}"
+      state: present
+
+- name: Install Morpheus Offline
+  yum:
+      name: "{{ morpheus_offline_package }}"
+      state: present

@@ -1,0 +1,49 @@
+ubuntu_elasticsearch_package: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.11.deb
+centos_elasticsearch_package: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.10.rpm
+es_cluster_name: morpheus
+
+rabbitmq_user: morpheus
+rabbitmq_password: password
+rabbitmq_plugins: 
+    - rabbitmq_stomp
+    - rabbitmq_management
+config_rabbitmq_ha: true
+enable_rabbitmq_clustering: true
+ubuntu_erlang_repo: "deb http://packages.erlang-solutions.com/ubuntu xenial erlang"
+epel_repo_url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+epel_repo_gpg_key_url: "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+epel_repofile_path: "/etc/yum.repos.d/epel.repo"
+erlang_cookie: LSKNKBELKPSTDBBCHETL
+vhost_name: morpheus
+durable: true
+routing_key: morpheus
+tags: 'ha-mode=all,ha-sync-mode=automatic'
+
+percona_repo_url_centos: http://www.percona.com/downloads/percona-release/redhat/0.1-6/percona-release-0.1-6.noarch.rpm
+percona_db_version_centos: Percona-XtraDB-Cluster-57
+percona_repo_url_ubuntu: https://repo.percona.com/apt/percona-release_0.1-6.xenial_all.deb
+percona_db_version_ubuntu: percona-xtradb-cluster-full-57
+mysql_root_pw: password
+mysql_install_pw: vmware
+sstuser: sstuser
+sstpassword: password
+wsrep_cluster_name: morpheus
+morpheus_db: morpheusdb
+morpheus_db_user: morpheus
+morpheus_db_pass: password
+
+appliance_url: gottagetaway.com
+ubuntu_morpheus_lts_package: https://downloads.gomorpheus.com/files/morpheus-appliance_3.4.3-1_amd64.deb
+ubuntu_morpheus_lts_offline_package: https://downloads.gomorpheus.com/files/morpheus-appliance-offline_3.4.3-1_all.deb
+ubuntu_morpheus_feature_package: https://downloads.gomorpheus.com/files/morpheus-appliance_3.5.2-3_amd64.deb
+ubuntu_morpheus_feature_offline_package: https://downloads.gomorpheus.com/files/morpheus-appliance-offline_3.5.2-1_all.deb
+centos_morpheus_package: https://downloads.gomorpheus.com/files/morpheus-appliance-3.5.1-1.el7.x86_64.rpm
+centos_morpheus_offline_package: https://downloads.gomorpheus.com/files/morpheus-appliance-offline-3.5.1-1.noarch.rpm
+rabbitmq_lb: 10.177.30.100
+
+
+ubuntu_supported_version: '16.04'
+centos_supported_version: '7.4'
+
+elastic_host_count: "{{ groups['elastic'] | length }}"
+rabbitmq_host_count: "{{ groups['rabbitmq'] | length }}"

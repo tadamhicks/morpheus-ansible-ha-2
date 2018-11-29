@@ -1,0 +1,51 @@
+---
+
+#- include_tasks: selinux.yml
+
+# Ubuntu
+- include_tasks: percona_prep_ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+- include_tasks: percona_install_ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+
+# Centos
+- include_tasks: percona_prep_centos.yml
+  when: ansible_distribution == "CentOS"
+
+- include_tasks: percona_install_centos.yml
+  when: ansible_distribution == "CentOS"
+
+# Ubuntu - Set MYSQL ROOT
+- include_tasks: percona_set_root_ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+# Centos - Set MYSQL ROOT
+- include_tasks: percona_set_root_centos.yml
+  when: ansible_distribution == "CentOS"
+
+# Universal 
+- include_tasks: percona_sstuser.yml
+
+
+# Ubuntu
+- include_tasks: percona_config_ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+# Centos
+- include_tasks: percona_config_centos.yml
+  when: ansible_distribution == "CentOS"
+
+
+# Ubuntu
+- include_tasks: percona_bootstrap_ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+# Centos
+- include_tasks: percona_bootstrap_centos.yml
+  when: ansible_distribution == "CentOS"
+
+
+# Universal
+- include_tasks: percona_db_create.yml

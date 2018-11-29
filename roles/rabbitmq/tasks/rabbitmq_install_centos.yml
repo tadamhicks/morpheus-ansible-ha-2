@@ -1,0 +1,18 @@
+---
+
+- name: Import RabbitMQ signing key
+  rpm_key:
+      state: present
+      key: https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
+
+- name: Install RabbitMQ RPM
+  yum:
+      name: https://www.rabbitmq.com/releases/rabbitmq-server/v3.6.10/rabbitmq-server-3.6.10-1.el7.noarch.rpm
+      state: present
+
+- name: Ensuring the RabbitMQ Service is running
+  service: name=rabbitmq-server state=started enabled=yes
+
+- name: checking to see if already clustered
+  stat: path=/etc/rabbitmq/clustered
+  register: clustered

@@ -1,0 +1,12 @@
+---
+
+- name: Install Elasticsearch
+  apt:
+      deb: "{{ ubuntu_elasticsearch_package }}"
+      state: present
+
+- name: Ensuring the Elasticsearch Service is running
+  systemd:
+    name: elasticsearch
+    state: started
+    enabled: yes 

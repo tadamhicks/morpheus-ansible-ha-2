@@ -1,0 +1,13 @@
+---
+
+- name: Percona grab temporary password
+  shell: grep 'temporary password' /var/log/mysqld.log | awk '{print $11}'
+  register: rootpass
+  ignore_errors: True
+
+- name: Change Percona Root Pass
+  shell:
+      cmd: | 
+          mysql -u root -p"{{ rootpass.stdout }}" --connect-expired-password << EOF
+          ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_root_pw }}';
+          EOF

@@ -1,0 +1,19 @@
+---
+- name: Percona create the DB
+  mysql_db:
+      name: "{{ morpheus_db }}"
+      login_user: root
+      login_password: "{{ mysql_root_pw }}"
+  when: inventory_hostname == "{{ groups['db'][0] }}"
+
+- name: Percona create the service user
+  mysql_user:
+      name: "{{ morpheus_db_user }}"
+      host: "{{ item }}"
+      password: "{{ morpheus_db_pass }}"
+      login_user: root
+      login_password: "{{ mysql_root_pw }}"
+      state: present
+      priv: '{{ morpheus_db }}.*:ALL'
+  with_items: "{{ lookup('template', 'percona.morpheus.j2') }}"
+  when: inventory_hostname == "{{ groups['db'][0] }}"

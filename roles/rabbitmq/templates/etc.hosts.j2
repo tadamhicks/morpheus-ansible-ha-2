@@ -1,0 +1,3 @@
+{% for minion in groups['rabbit'] %}
+{{ hostvars[minion]['ansible_all_ipv4_addresses'][0] }} {{ hostvars[minion]['ansible_nodename'] }}
+{% endfor %}

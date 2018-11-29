@@ -1,0 +1,6 @@
+---
+- name: Percona Config for clustering
+  blockinfile:
+      dest: /etc/my.cnf
+      block: "{{ lookup('template', 'percona.config.j2') }}"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK"

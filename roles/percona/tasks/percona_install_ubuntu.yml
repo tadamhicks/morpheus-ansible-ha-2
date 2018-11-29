@@ -1,0 +1,29 @@
+---
+
+- name: Add default password for percona first pass 
+  shell: echo "percona-xtradb-cluster-server-5.7   percona-xtradb-cluster-server-5.7/root-pass password {{ mysql_install_pw }}" | sudo debconf-set-selections
+  ignore_errors: True
+  
+- name: Add default password for percona second pass
+  shell: echo "percona-xtradb-cluster-server-5.7   percona-xtradb-cluster-server-5.7/re-root-pass  password {{ mysql_install_pw }}" | sudo debconf-set-selections
+  ignore_errors: True
+
+- name: Import Percona Repo
+  apt:
+    deb: '{{ percona_repo_url_ubuntu }}'
+    state: present
+
+- name: Update Cache
+  apt: 
+    update_cache: yes 
+    
+- name: Install Percona XtraDB Cluster from Repo
+  apt:
+    name: '{{ percona_db_version_ubuntu }}'
+    state: present
+
+- name: Ensuring the Percona Service is running
+  systemd: 
+      name: mysql
+      state: started
+      enabled: true  

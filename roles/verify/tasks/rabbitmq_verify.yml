@@ -1,0 +1,3 @@
+---
+
+commanda: rabbitmqctl cluster_status

@@ -1,0 +1,36 @@
+---
+
+# Check elastic search is up and running.  
+
+# curl - each node verify it gets jason response. 
+- name: Check if Elastic Search cluster is showing green.  
+  uri:
+    url: http://{{ groups['elastic'][0] }}:9200/_cluster/health
+    return_content: yes
+  register: esclusterhealth
+  failed_when: "'green' not in esclusterhealth.content" 
+  when: inventory_hostname == "{{ groups['elastic'][0] }}"
+
+#- uri:
+#    url: http://10.177.210.166:9200/_cat/indices?v
+#    return_content: yes
+#  args: 
+#    warn: false
+#  register: esclusterindex
+  #failed_when: "'green' not in esclusterhealth.content"
+#  when: inventory_hostname == "{{ groups['elastic'][0] }}"
+
+#- name: Check to see if RabbitMQ is running properly. 
+#  command: rabbitmqctl cluster_status
+#  register: rabbitmq_status.stdout
+  
+  
+- name: Elastic Search Status Output
+  vars: 
+    msg: |
+        Elastic Search Cluster Status: {{ esclusterhealth }}
+        Space: " "
+      #  Elastic Search Indices: {{ esclusterindex }}
+  debug:
+    msg: "{{ msg.split('\n') }}"
+  when: inventory_hostname == "{{ groups['elastic'][0] }}"    
